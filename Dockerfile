@@ -20,7 +20,7 @@ RUN sed -i "s|#node_auto_indexing|node_auto_indexing|g" /var/lib/neo4j/conf/neo4
 RUN sed -i "s|#node_keys_indexable|node_keys_indexable|g" /var/lib/neo4j/conf/neo4j.properties
 
 ## do not create initial schema on restore
-## WORKDIR /var/lib/neo4j
+WORKDIR /var/lib/neo4j
 ## RUN ./bin/neo4j-shell -path /var/lib/neo4j/data/udo.db -file ./scripts/uman.cyp
 
 WORKDIR /
