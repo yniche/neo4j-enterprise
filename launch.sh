@@ -21,5 +21,11 @@ limit=`ulimit -n`
 if [ "$limit" -lt 65536 ]; then
     ulimit -n 65536;
 fi
+<<<<<<< HEAD
 chmod 777 .$NEO4J_HOME/bin/neo4j
 .$NEO4J_HOME/bin/neo4j console
+=======
+
+.$NEO4J_HOME/bin/neo4j console
+
+>>>>>>> origin/master
