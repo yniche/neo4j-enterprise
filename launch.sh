@@ -1,3 +1,4 @@
+
 NEO4J_HOME=/var/lib/neo4j
 
 if [ -n "$NEO4J_AUTH" ]; then
@@ -23,4 +24,3 @@ if [ "$limit" -lt 65536 ]; then
 fi
 
 .$NEO4J_HOME/bin/neo4j console
-
