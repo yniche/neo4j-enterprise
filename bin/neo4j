@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ### BEGIN REDHAT INFO
 # chkconfig: 2345 99 20
 # description: The Neo4J graph database server. See http://neo4j.org
@@ -10,7 +10,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 ### END INIT INFO
-# Copyright (c) 2002-2014 "Neo Technology,"
+# Copyright (c) 2002-2015 "Neo Technology,"
 
 # Network Engine for Objects in Lund AB [http://neotechnology.com]
 #
@@ -48,8 +48,9 @@ function findBaseDirAndCdThere {
   done
   NEO4J_HOME=`cd $( dirname "$SCRIPT" )/.. && dirs -l +0`
   NEO4J_INSTANCE=$NEO4J_HOME
-  NEO4J_CONFIG=$NEO4J_INSTANCE/conf
-  NEO4J_LOG=$NEO4J_INSTANCE/data/log
+  [ -n "$NEO4J_CONFIG" ] || NEO4J_CONFIG=$NEO4J_HOME/conf
+  [ -n "$NEO4J_LOG" ] || NEO4J_LOG=$NEO4J_HOME/data/log
+  [ -n "$NEO4J_PIDFILE" ] || NEO4J_PIDFILE=$NEO4J_HOME/data/neo4j-service.pid
 
   cd "$NEO4J_HOME"
 }
@@ -74,7 +75,7 @@ JAVA_OPTS="-server -XX:+DisableExplicitGC ${wrapper_java_additional}"
 [ -z "${wrapper_java_initmemory}" ] || JAVA_OPTS="$JAVA_OPTS -Xms${wrapper_java_initmemory}m"
 [ -z "${wrapper_java_maxmemory}" ] || JAVA_OPTS="$JAVA_OPTS -Xmx${wrapper_java_maxmemory}m"
 
-#NEO4J_SERVER_PORT=`( egrep "^org.neo4j.server.webserver.port" $NEO4J_INSTANCE/conf/neo4j-server.properties || echo 7474 ) | sed -e 's/.*=//'`
+#NEO4J_SERVER_PORT=`( egrep "^org.neo4j.server.webserver.port" $NEO4J_CONFIG/neo4j-server.properties || echo 7474 ) | sed -e 's/.*=//'`
 NEO4J_SERVER_PORT=${org_neo4j_server_webserver_port:=7474}
 
 LAUNCHD_NAME="${LAUNCHD_NAME}.${NEO4J_SERVER_PORT}"
@@ -96,7 +97,7 @@ LAUNCHD_DIR=~/Library/LaunchAgents/
 
 TIMEOUT=120
 
-PID_FILE=${NEO4J_INSTANCE}/data/neo4j-service.pid
+PID_FILE=${NEO4J_PIDFILE}
 buildclasspath() {
   # confirm library jars
   LIBDIR="$NEO4J_HOME"/lib
@@ -134,7 +135,7 @@ buildclasspath() {
   CLASSPATH=${ALL_JARS}
 
   # add useful conf stuff to classpath - always a good idea
-  CLASSPATH="$CLASSPATH":"$NEO4J_HOME"/conf/
+  CLASSPATH="$CLASSPATH":"$NEO4J_CONFIG"
 }
 
 detectrunning() {
@@ -164,8 +165,6 @@ startit() {
 	     exit 2;
   fi
 
-  echo "Using additional JVM arguments: " $JAVA_OPTS
-
   if [ $DIST_OS = "macosx" ] ; then
     getlaunchdpid
     if [ $LAUNCHDPID -eq 0 ] ; then
@@ -194,7 +193,6 @@ startit() {
         -Dfile.encoding=UTF-8 \
         org.neo4j.server.Bootstrapper >> \"${CONSOLE_LOG}\" 2>&1 & echo \$! > \"$PID_FILE\" "
     else
-      checkwriteaccess
       echo "WARNING: not changing user"
       "$JAVACMD" -cp "${CLASSPATH}" $JAVA_OPTS  \
         -Dneo4j.home="${NEO4J_HOME}" -Dneo4j.instance="${NEO4J_INSTANCE}" \
@@ -268,7 +266,6 @@ console() {
 
     exitonnojava
     buildclasspath
-    checkwriteaccess
     checkandrepairenv
 
     echo "Using additional JVM arguments: " $JAVA_OPTS
@@ -289,16 +286,16 @@ console() {
 # pass in "true" for created to mark that the user was created (instead than pre-existing)
 modify_user_config() {
   created=${2:-"false"}
-  if `grep -q "wrapper\.user=" "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"` ; then
-    sed -i -e "s/^.*wrapper\.user=.*$/wrapper\.user=$1/" "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"
+  if `grep -q "wrapper\.user=" "$NEO4J_CONFIG/neo4j-wrapper.conf"` ; then
+    sed -i -e "s/^.*wrapper\.user=.*$/wrapper\.user=$1/" "$NEO4J_CONFIG/neo4j-wrapper.conf"
   else
-    echo "wrapper.user=$1" >> "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"
+    echo "wrapper.user=$1" >> "$NEO4J_CONFIG/neo4j-wrapper.conf"
   fi
 
-  if `grep -q "wrapper\.user\.created=" "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"` ; then
-    sed -i -e "s/^.*wrapper\.user\.created=.*$/wrapper\.user\.created=${created}/" "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"
+  if `grep -q "wrapper\.user\.created=" "$NEO4J_CONFIG/neo4j-wrapper.conf"` ; then
+    sed -i -e "s/^.*wrapper\.user\.created=.*$/wrapper\.user\.created=${created}/" "$NEO4J_CONFIG/neo4j-wrapper.conf"
   else
-    echo "wrapper.user.created=${created}" >> "$NEO4J_INSTANCE/conf/neo4j-wrapper.conf"
+    echo "wrapper.user.created=${created}" >> "$NEO4J_CONFIG/neo4j-wrapper.conf"
   fi
 }
 
@@ -388,7 +385,7 @@ case "${!OPTIND}" in
     exit 1
     ;;
   *)
-    echo "Usage: neo4j { console | start | start-no-wait | stop | restart | status | info | install | remove }"
+    echo "Usage: neo4j { console | start | start-no-wait | stop | restart | status | info }"
     exit 0;;
 
 esac

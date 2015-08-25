@@ -23,13 +23,13 @@
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>data/log/http.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>data/log/http.%d{yyyy-MM-dd_HH}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
+      <fileNamePattern>data/log/http.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>7</maxHistory>
     </rollingPolicy>
 
     <encoder>
       <!-- Note the deliberate misspelling of "referer" in accordance with RFC1616 -->
-      <pattern>%h %l %user [%t{dd/MMM/yyyy:HH:mm:ss Z}] "%r" %s %b "%i{Referer}" "%i{User-Agent}"</pattern>
+      <pattern>%h %l %user [%t{dd/MMM/yyyy:HH:mm:ss Z}] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %D</pattern>
     </encoder>
   </appender>
 

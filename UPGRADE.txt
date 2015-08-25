@@ -16,10 +16,11 @@ Table of Contents
 
     This section describes upgrading a single Neo4j instance. Upgrading a Neo4j
     HA cluster (Neo4j Enterprise) requires a very specific process be followed.
-    Please refer to ???.
+    Please see Upgrade of a Neo4j HA Cluster at
+    <http://neo4j.com/docs/2.2.4/ha-upgrade-guide.html> .
 
-A database created by an older version of Neo4j will be upgraded when opened by 
-Neo4j 2.1.7 during startup. Whilst this upgrade will occur automatically for 
+A database created by an older version of Neo4j will be upgraded during startup 
+when opened by Neo4j 2.2.4. While this upgrade will occur automatically for 
 minor changes, larger migrations require explicit configuration before Neo4j 
 will start.
 
@@ -29,14 +30,14 @@ configuration to allow them.
 
 In this release of Neo4j, the following upgrades are permitted.
 
-1.9.x --> 2.1.7
+1.9.x --> 2.2.4
     Explicit configuration is required
 
-2.0.x --> 2.1.7
+2.0.x --> 2.2.4
     Explicit configuration is required
 
-2.1.x --> 2.1.7
-    Automatically performs any store upgrade
+2.1.x --> 2.2.4
+    Explicit configuration is required
 
 
 
@@ -56,12 +57,20 @@ In this release of Neo4j, the following upgrades are permitted.
 To perform a normal store upgrade (for minor changes to the database store):
 
    1. Cleanly shut down the older version of Neo4j, if it is running.
-   2. Install Neo4j 2.1.7, and set it up to use the same database store
+   2. Install Neo4j 2.2.4, and set it up to use the same database store
       directory (typically data/graph.db).
-   3. NOTE: It is strongly advised to make a copy of the database store
-      directory at this time, to use as a backup in case rollback/downgrade is
-      required. This is not necessary if a backup has been made using the 
-      online backup tool, available with Neo4j Enterprise.
+   3. Make a copy of the database.
+
+
+          Important
+
+          It is strongly advised to make a copy of the database store directory
+          at this time, to use as a backup in case rollback/downgrade is
+          required. This is not necessary if a backup has been made using the
+          online backup tool (see
+          <http://neo4j.com/docs/2.2.4/operations-backup.html> ), available
+          with Neo4j Enterprise.
+
    4. Start up Neo4j.
    5. Any database store upgrade required will occur during startup.
 ----------------------------------------------------------------------------
@@ -74,9 +83,9 @@ To perform a normal store upgrade (for minor changes to the database store):
 To perform an explicit store upgrade (required for significant changes to the 
 database store):
 
-   1. Cleanly shut down the older version of Neo4j, if it is running.
-   2. Install Neo4j 2.1.7, and set it up to use the same database store
+   1. Install Neo4j 2.2.4, and set it up to use the same database store
       directory (typically data/graph.db).
+   2. Cleanly shut down the older version of Neo4j, if it is running.
    3. Set the Neo4j configuration parameter allow_store_upgrade=true in your 
       conf/neo4j.properties file. Neo4j will fail to start without this
       configuration set.
@@ -104,4 +113,5 @@ database store):
     However, Neo4j supports compatibility directives for Cypher, that allow
     explicitly selecting a language version. This is possible to do for
     individual statements, or globally, as described in the Cypher
-    Compatibility section.
+    Compatibility section at see
+    <http://neo4j.com/docs/2.2.4/cypher-compatibility.html> .

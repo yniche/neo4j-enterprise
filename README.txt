@@ -1,7 +1,7 @@
-Neo4j 2.1.7
+Neo4j 2.2.4
 =======================================
 
-Welcome to Neo4j release 2.1.7, a high-performance graph database.
+Welcome to Neo4j release 2.2.4, a high-performance graph database.
 This is the enterprise distribution of Neo4j, including everything you need to
 start building applications that can model, persist and explore graph-like data.
 
@@ -24,7 +24,7 @@ Here in the installation directory, you'll find:
 Make it go
 ----------
 
-For full instructions, see http://neo4j.com/docs/2.1.7/deployment.html
+For full instructions, see http://neo4j.com/docs/2.2.4/deployment.html
 
 To get started with Neo4j, let's start the server and take a
 look at the web interface ...
@@ -43,11 +43,10 @@ Learn more
 ----------
 
 * Neo4j Home: http://neo4j.com/
-* Getting Started: http://neo4j.com/docs/2.1.7/introduction.html
-* The Neo4j Manual: http://neo4j.com/docs/2.1.7/
+* Getting Started: http://neo4j.com/docs/2.2.4/introduction.html
+* The Neo4j Manual: http://neo4j.com/docs/2.2.4/
 
 License(s)
 ----------
 Various licenses apply. Please refer to the LICENSE and NOTICE files for more
 detailed information.
-

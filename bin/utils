@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2002-2014 "Neo Technology,"
+# Copyright (c) 2002-2015 "Neo Technology,"
 # Network Engine for Objects in Lund AB [http://neotechnology.com]
 #
 # This file is part of Neo4j.
@@ -128,8 +128,8 @@ checkstatus() {
 
 checkwriteaccess() {
     if [ $UID != 0 ] ; then
-    if [ ! -w "$NEO4J_INSTANCE/data" ] ; then
-      echo "ERROR: No write access to data/ directory, run either as user $NEO4J_USER or root"
+    if [ ! -w "$NEO4J_LOG" ] ; then
+      echo "ERROR: No write access to $NEO4J_LOG directory, run either as user $NEO4J_USER or root"
       exit 1
     fi
     fi
@@ -181,7 +181,7 @@ detectos() {
       # HP-UX needs the XPG4 version of ps (for -o args)
       DIST_OS="hpux"
       UNIX95=""
-      export UNIX95   
+      export UNIX95
       ;;
     'darwin')
       DIST_OS="macosx"
@@ -241,9 +241,25 @@ stopit() {
       checkstatus
       x=$[$x+1]
     done
-	  [  $x -eq $TIMEOUT ] && ( echo " force shutdown" ;  kill -9 $NEO4J_PID >/dev/null ) || echo " done"
+	  [ $x -eq $TIMEOUT ] && killit $NEO4J_PID $TIMEOUT || echo " done"
 	  [ -e "$PID_FILE" ] && rm  "$PID_FILE"
   fi
+}
+
+killit() {
+   NEO4J_PID=$1
+   TIMEOUT=$2
+   echo " force shutdown"
+
+   x=0
+   while [ $x -lt $TIMEOUT ] && [ "$NEO4J_PID" != "" ]  ; do
+     kill -9 $NEO4J_PID >/dev/null
+     printf "."
+     sleep 1
+     checkstatus
+     x=$[$x+1]
+   done
+     [ $x -eq $TIMEOUT ] && echo " failed" || echo " done"
 }
 
 # Creates a user on the system
@@ -266,12 +282,12 @@ remove_user() {
     else
       DELETE_CMD='/usr/sbin/userdel'
     fi
-    
+
     case $yn in
       [Yy]* ) $DELETE_CMD $wrapper_user
               modify_user_config "" "true"
         ;;
-      * ) echo "OK, we'll let that user live, for now." 
+      * ) echo "OK, we'll let that user live, for now."
         ;;
     esac
   else
@@ -323,12 +339,12 @@ removeservice() {
 # Runs before the server command, making sure that whatever should be in place is
 # in place.
 checkandrepairenv() {
-    # Create data/log if missing, change owner if created.
-    if [ ! -d "$NEO4J_HOME"/data/log ]; then
-      echo "${NEO4J_HOME}/data/log was missing, recreating..."
-      mkdir "$NEO4J_HOME"/data/log
+    # Create log directory if missing, change owner if created.
+    if [ ! -d "$NEO4J_LOG" ]; then
+      echo "${NEO4J_LOG} was missing, recreating..."
+      mkdir "$NEO4J_LOG"
       if [ $UID == 0 ] ; then
-        chown $NEO4J_USER "$NEO4J_HOME"/data/log
+        chown $NEO4J_USER "$NEO4J_LOG"
       fi
     fi
 }
