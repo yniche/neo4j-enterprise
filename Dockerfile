@@ -1,17 +1,19 @@
-## Neo4J + spatial 
+## Neo4J + spatial
 ## Based from maintainer Tiago Pires, tiago-a-pires@ptinovacao.pt
 ## Neo4J dependency: dockerfile/java:oracle-java8
 ## get java from trusted build
 ## Modified from: FROM dockerfile/java:oracle-java8  to below
 FROM java:8
 
-MAINTAINER Qiang Han <qiang.han@machool.com>
+MAINTAINER James C Russell <james@yniche.com>
+
+RUN apt-get update && apt-get install bsdmainutils -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ## install neo4j ent 2.1.7
-ADD . /var/lib/neo4j 
+ADD . /var/lib/neo4j
 
 ## add launcher and set execute property
-ADD launch.sh /
+ADD launch.sh build_auth_string.sh /
 RUN chmod +x /launch.sh
 
 ## turn on indexing: http://chrislarson.me/blog/install-neo4j-graph-database-ubuntu
